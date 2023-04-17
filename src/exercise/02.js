@@ -3,14 +3,20 @@
 
 import * as React from 'react'
 
-function Greeting({initialName = ''}) {
-  const [name, setName] = React.useState(() => window.localStorage.getItem('name') || initialName)
-
+const useLocalStorage = (key, initialName) => {
+  const [state, setState] = React.useState(() => window.localStorage.getItem(key) || initialName)
+  
   React.useEffect(() => {
-    window.localStorage.setItem('name', name);
-  })
+    window.localStorage.setItem(key, state);
+  }, [state, key])
+  
+  return [state, setState]
+}
 
-  function handleChange(event) {
+function Greeting({initialName = ''}) {
+  const [name, setName] = useLocalStorage('tuamo', initialName)
+
+  const handleChange = (event) => {
     setName(event.target.value)
   }
 
@@ -26,7 +32,7 @@ function Greeting({initialName = ''}) {
 }
 
 function App() {
-  return <Greeting initialName='George' />
+  return <Greeting initialName='Bob' />
 }
 
 export default App
