@@ -2,10 +2,21 @@
 // http://localhost:3000/isolated/exercise/04.js
 
 import * as React from 'react'
+const EMPTY_GAME = Array(9).fill(null);
 
 function Board() {
   // 🐨 squares is the state for this component. Add useState for squares
-  const [ squares, setSquares ] = React.useState(Array(9).fill(null))
+  const [ squares, setSquares ] = React.useState(() => {
+    if (localStorage.getItem('squares')) {
+      return JSON.parse(localStorage.getItem('squares'))
+    }
+    return EMPTY_GAME
+  })
+
+  React.useEffect(() => {
+    localStorage.setItem('squares', JSON.stringify(squares))
+  }, [squares])
+
   const nextValue = calculateNextValue(squares)
   const winner = calculateWinner(squares)
   const status = calculateStatus(winner, squares, nextValue)
@@ -21,7 +32,7 @@ function Board() {
   }
 
   function restart() {
-    setSquares(Array(9).fill(null))
+    setSquares(EMPTY_GAME)
   }
 
   function renderSquare(i) {
@@ -78,6 +89,7 @@ function calculateStatus(winner, squares, nextValue) {
 
 // eslint-disable-next-line no-unused-vars
 function calculateNextValue(squares) {
+  console.log({ squares })
   return squares.filter(Boolean).length % 2 === 0 ? 'X' : 'O'
 }
 
