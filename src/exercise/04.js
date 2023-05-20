@@ -2,20 +2,12 @@
 // http://localhost:3000/isolated/exercise/04.js
 
 import * as React from 'react'
+import { useLocalStorageState } from '../utils';
 const EMPTY_GAME = Array(9).fill(null);
 
 function Board() {
   // 🐨 squares is the state for this component. Add useState for squares
-  const [ squares, setSquares ] = React.useState(() => {
-    if (localStorage.getItem('squares')) {
-      return JSON.parse(localStorage.getItem('squares'))
-    }
-    return EMPTY_GAME
-  })
-
-  React.useEffect(() => {
-    localStorage.setItem('squares', JSON.stringify(squares))
-  }, [squares])
+  const [ squares, setSquares ] = useLocalStorageState('squares', EMPTY_GAME)
 
   const nextValue = calculateNextValue(squares)
   const winner = calculateWinner(squares)
@@ -89,7 +81,6 @@ function calculateStatus(winner, squares, nextValue) {
 
 // eslint-disable-next-line no-unused-vars
 function calculateNextValue(squares) {
-  console.log({ squares })
   return squares.filter(Boolean).length % 2 === 0 ? 'X' : 'O'
 }
 
