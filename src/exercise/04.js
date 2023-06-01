@@ -2,34 +2,13 @@
 // http://localhost:3000/isolated/exercise/04.js
 
 import * as React from 'react'
-import { useLocalStorageState } from '../utils';
-const EMPTY_GAME = Array(9).fill(null);
+import {useLocalStorageState} from '../utils'
+const EMPTY_GAME = Array(9).fill(null)
 
-function Board() {
-  // 🐨 squares is the state for this component. Add useState for squares
-  const [ squares, setSquares ] = useLocalStorageState('squares', EMPTY_GAME)
-
-  const nextValue = calculateNextValue(squares)
-  const winner = calculateWinner(squares)
-  const status = calculateStatus(winner, squares, nextValue)
-
-  function selectSquare(square) {
-    if (winner || squares[square] !== null) {
-      return
-    }
-
-    const newSquares = [...squares]
-    newSquares[square] = nextValue
-    setSquares(newSquares)
-  }
-
-  function restart() {
-    setSquares(EMPTY_GAME)
-  }
-
+function Board({onClick, squares}) {
   function renderSquare(i) {
     return (
-      <button className="square" onClick={() => selectSquare(i)}>
+      <button className="square" onClick={() => onClick(i)}>
         {squares[i]}
       </button>
     )
@@ -37,7 +16,6 @@ function Board() {
 
   return (
     <div>
-      <div className="status">{status}</div>
       <div className="board-row">
         {renderSquare(0)}
         {renderSquare(1)}
@@ -53,18 +31,88 @@ function Board() {
         {renderSquare(7)}
         {renderSquare(8)}
       </div>
-      <button className="restart" onClick={restart}>
-        restart
-      </button>
     </div>
   )
 }
 
 function Game() {
+  // 🐨 squares is the state for this component. Add useState for squares
+  const [currentGame, setCurrentGame] = useLocalStorageState(
+    'squares',
+    EMPTY_GAME,
+  )
+  const [history, setHistory] = useLocalStorageState('history', [EMPTY_GAME])
+
+  const nextValue = calculateNextValue(currentGame)
+  const winner = calculateWinner(currentGame)
+  const status = calculateStatus(winner, currentGame, nextValue)
+  const moves = calculateMoves(history)
+  const currentGameMoves = calculateGameMoves(currentGame)
+
+  function selectSquare(square) {
+    if (winner || currentGame[square] !== null) {
+      return
+    }
+
+    const newSquares = [...currentGame]
+    newSquares[square] = nextValue
+
+    const newGameMoves = calculateGameMoves(newSquares)
+    setCurrentGame(newSquares)
+
+    let newHistory
+    if (newGameMoves.length >= history.length) {
+      newHistory = [...history]
+      newHistory.push(newSquares)
+      setHistory(newHistory)
+    } else {
+      const lastMovePosition = newGameMoves.length - 1
+      newHistory = history.slice(0, lastMovePosition)
+      newHistory[lastMovePosition] = newSquares
+      setHistory(newHistory)
+    }
+  }
+
+  function restart() {
+    setCurrentGame(EMPTY_GAME)
+    setHistory([EMPTY_GAME])
+  }
+
+  function moveGameToStep(step) {
+    const gameStep = history[step]
+
+    setCurrentGame(gameStep)
+  }
+
+  console.log({history, moves})
+
   return (
     <div className="game">
       <div className="game-board">
-        <Board />
+        <Board onClick={selectSquare} squares={currentGame} />
+        <button className="restart" onClick={restart}>
+          restart
+        </button>
+      </div>
+      <div className="game-info">
+        <div>{status}</div>
+        <ol>
+          {moves.map((move, index) => {
+            const isCurrentMove = history.length - 1 === move
+            return (
+              <li key={index}>
+                <input
+                  type="button"
+                  onClick={() => moveGameToStep(index)}
+                  value={`Go to ${
+                    move === 0 ? 'game start' : `move # ${move}`
+                  } ${isCurrentMove ? '(current)' : ''}`}
+                  disabled={isCurrentMove}
+                />
+              </li>
+            )
+          })}
+        </ol>
       </div>
     </div>
   )
@@ -103,6 +151,18 @@ function calculateWinner(squares) {
     }
   }
   return null
+}
+
+function calculateMoves(history) {
+  return history.map((square, index) => index)
+}
+
+function calculateGameMoves(squares) {
+  const currentMoves = squares
+    .filter(square => square !== null)
+    .map((square, index) => index + 1)
+
+  return Array(1).fill(0).concat(currentMoves)
 }
 
 function App() {

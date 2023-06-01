@@ -4,25 +4,25 @@
 import * as React from 'react'
 
 function Name() {
-  const [name, setName] = React.useState('');
+  const [name, setName] = React.useState('')
 
   return (
     <div>
       <label htmlFor="name">Name: </label>
-      <input id="name" value={name} onChange={event => setName(event.target.value)} />
+      <input
+        id="name"
+        value={name}
+        onChange={event => setName(event.target.value)}
+      />
     </div>
   )
 }
 
-function FavoriteAnimal({ animal, onAnimalChange}) {
+function FavoriteAnimal({animal, onAnimalChange}) {
   return (
     <div>
       <label htmlFor="animal">Favorite Animal: </label>
-      <input
-        id="animal"
-        value={animal}
-        onChange={onAnimalChange}
-      />
+      <input id="animal" value={animal} onChange={onAnimalChange} />
     </div>
   )
 }
@@ -32,7 +32,7 @@ function Display({animal}) {
 }
 
 function App() {
-  const [animal, setAnimal ] = React.useState('');
+  const [animal, setAnimal] = React.useState('')
 
   return (
     <form>
