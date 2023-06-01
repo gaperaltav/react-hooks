@@ -47,7 +47,6 @@ function Game() {
   const winner = calculateWinner(currentGame)
   const status = calculateStatus(winner, currentGame, nextValue)
   const moves = calculateMoves(history)
-  const currentGameMoves = calculateGameMoves(currentGame)
 
   function selectSquare(square) {
     if (winner || currentGame[square] !== null) {
