@@ -38,13 +38,13 @@ function Board({onClick, squares}) {
 function Game() {
   // 🐨 squares is the state for this component. Add useState for squares
   const [history, setHistory] = useLocalStorageState('history', [EMPTY_GAME])
-  const [currentMove, setCurrentMove] =useLocalStorageState('history:move', 0)
+  const [currentMove, setCurrentMove] = useLocalStorageState('history:move', 0)
 
   const currentSquares = history[currentMove]
   const nextValue = calculateNextValue(currentSquares)
   const winner = calculateWinner(currentSquares)
   const status = calculateStatus(winner, currentSquares, nextValue)
-  
+
   function selectSquare(square) {
     if (winner || currentSquares[square] !== null) {
       return
@@ -76,16 +76,15 @@ function Game() {
         <div>{status}</div>
         <ol>
           {history.map((move, step) => {
-
             const desc = step === 0 ? `Go to game start` : `Go to move #${step}`
-          
+
             return (
               <li key={step}>
                 <button
                   onClick={() => setCurrentMove(step)}
                   disabled={currentMove === step}
                 >
-                  {desc} {currentMove ===  step ? '(current)': null}
+                  {desc} {currentMove === step ? '(current)' : null}
                 </button>
               </li>
             )
@@ -130,7 +129,6 @@ function calculateWinner(squares) {
   }
   return null
 }
-
 
 function App() {
   return <Game />
